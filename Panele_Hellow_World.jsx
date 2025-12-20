@@ -66,7 +66,7 @@ CHellowWorldDlg.prototype = CPaletteWindow.prototype;   // サブクラスのメ
 
 // 追加したいソッドをここで定義
 CHellowWorldDlg.prototype.HelloWorld = function() {
-    alert("Hellow world");
+    alert("Hellow world xxx");
 }
     
 // 追加したいメソッドをここで定義
