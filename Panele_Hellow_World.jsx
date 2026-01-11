@@ -17,7 +17,7 @@
    ボタンが押された　→　onClick　→　CallFuncでBridgeTalkを使用してHelloWorld2を呼ぶ　→　HelloWorldを呼ぶ
 */
 
-// Ver.1.0 : 2025/12/20
+// Ver.1.0 : 2025/12/27
 
 
 #target illustrator
@@ -30,7 +30,7 @@ SELF = (function(){
 })();
 
 // 外部のJSXを読み込む
-$.evalFile(SELF.parent.path + "/ZazLib/" + "PaletteWindow.jsx");
+$.evalFile(SELF.path + "/ZazLib/" + "PaletteWindow.jsx");
 
 
 //-----------------------------------
@@ -66,7 +66,7 @@ CHellowWorldDlg.prototype = CPaletteWindow.prototype;   // サブクラスのメ
 
 // 追加したいソッドをここで定義
 CHellowWorldDlg.prototype.HelloWorld = function() {
-    alert("Hellow world xxx");
+    alert("Hellow world 2026");
 }
     
 // 追加したいメソッドをここで定義

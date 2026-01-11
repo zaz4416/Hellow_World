@@ -3,6 +3,11 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+#下記のファイルは無視する
+._.DS_Store
+._Panele_Hellow_World.jsx
+._README.md
+
 # User-specific files
 *.rsuser
 *.suo
@@ -416,6 +421,23 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+._.gitignore
 ._Panele_Hellow_World.jsx
+._zazlib
+._Panele_Hellow_World.jsx
+._Panele_Hellow_World.jsx
+._.gitignore
+._.gitignore
+.DS_Store
+._.gitignore
+._.gitignore
+._.gitmodules
+._Panele_Hellow_World.jsx
+._.gitignore
+.github/workflows/._hello.yml
+.github/workflows/._release.yml
+._.gitignore
+._README.md
+._.gitignore
 ._.github
 ._.gitignore

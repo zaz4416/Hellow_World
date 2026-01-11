@@ -1,6 +1,7 @@
 # Hellow_World
 動作環境
 Adobe社のイラストレータで動作します。
+source-full.zip　をダウンロードしてください。
 
 動作概要
 表示されたボタンを押すと、HellowWorldを表示して終了します。
