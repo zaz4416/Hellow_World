@@ -2,8 +2,9 @@
 on: push                                # イベント　（プッシュ時に起動）
 jobs:                                   # ジョブ定義
     Hello:                              # ジョブID
-        tuns-on: ubuntu-latest          # ランナー
+        runs-on: ubuntu-latest          # ランナー
         steps:                          # ステップ定義
             - run:  echo "Hello, world" # シェルコマンドの実行
             - uses: actions/checkout@v4 # アクションを呼び出す
+
 
