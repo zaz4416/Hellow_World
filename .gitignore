@@ -442,3 +442,6 @@ FodyWeavers.xsd
 ._.github
 ._.gitignore
 ._.gitignore
+._.gitignore
+.DS_Store
+._README.md
