@@ -43,8 +43,8 @@ function CHellowWorldDlg( DlgName, InstanceName ) {
     // 初期化
     const TheObj = this;
     CPaletteWindow.call( TheObj );          // コンストラクタ
-    //TheObj.InitDialog( DlgName );           // イニシャライザ
-    //TheObj.InitInstance( InstanceName );    // インスタンス初期化
+    TheObj.InitDialog( DlgName );           // イニシャライザ
+    TheObj.InitInstance( InstanceName );    // インスタンス初期化
     const TheDialog = TheObj.GetDlg();      // ダイアログへのオブジェクトを得る
 
     // ダイアログにボタン追加
@@ -63,11 +63,6 @@ function CHellowWorldDlg( DlgName, InstanceName ) {
 
 CHellowWorldDlg.prototype = CPaletteWindow.prototype;   // サブクラスのメソッド追加よりも先に、継承させること
 
-// 追加したいソッドをここで定義
-CHellowWorldDlg.prototype.InitDialog = function(DlgName, InstanceName) {
-    CPaletteWindow.InitDialog( DlgName );           // イニシャライザ
-    CPaletteWindow.InitInstance( InstanceName );    // インスタンス初期化
-}
 
 // 追加したいソッドをここで定義
 CHellowWorldDlg.prototype.HelloWorld = function() {
