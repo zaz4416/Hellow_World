@@ -17,7 +17,7 @@
    ボタンが押された　→　onClick　→　CallFuncでBridgeTalkを使用してHelloWorld2を呼ぶ　→　HelloWorldを呼ぶ
 */
 
-// Ver.1.0 : 2025/12/27
+// Ver.1.0 : 2026/01/15
 
 
 #target illustrator
@@ -31,6 +31,34 @@ SELF = (function(){
 
 // 外部のJSXを読み込む
 $.evalFile(SELF.path + "/ZazLib/" + "PaletteWindow.jsx");
+
+
+//-----------------------------------
+// クラス CBoy
+//-----------------------------------
+
+// コンストラクタ (ここから) 
+function CBoy() { 
+} // コンストラクタ (ここまで) 
+
+// 追加したいメソッドをここで定義
+CBoy.prototype.HayHelloW = function() {
+    alert("Hellow world. I'm boy.");
+}
+
+
+//-----------------------------------
+// クラス CGirl
+//-----------------------------------
+
+// コンストラクタ (ここから) 
+function CGirl() { 
+} // コンストラクタ (ここまで) 
+
+// 追加したいメソッドをここで定義
+CGirl.prototype.HayHelloW = function() {
+    alert("Hellow world. I'm girl.");
+}
 
 
 //-----------------------------------
@@ -48,10 +76,10 @@ function CHellowWorldDlg( DlgName, InstanceName ) {
     const TheDialog = TheObj.GetDlg();      // ダイアログへのオブジェクトを得る
 
     // ダイアログにボタン追加
-    myButton = TheObj.AddButton("Push");
+    myButton = TheObj.AddButton("Push to Say Hellow World");
     myButton.onClick = function() {
         try {
-            TheObj.CallFunc( "HelloWorld2" );
+            TheObj.CallFunc( "SayHelloWorld" );
         }
         catch(e) {
             alert( e.message );
@@ -65,14 +93,15 @@ CHellowWorldDlg.prototype = CPaletteWindow.prototype;   // サブクラスのメ
 
 
 // 追加したいソッドをここで定義
-CHellowWorldDlg.prototype.HelloWorld = function() {
-    alert("Hellow world 2026");
+CHellowWorldDlg.prototype.HelloWorld = function( Human ) {
+    Human.HayHelloW();
 }
     
 // 追加したいメソッドをここで定義
-CHellowWorldDlg.prototype.HelloWorld2 = function() {
+CHellowWorldDlg.prototype.SayHelloWorld = function() {
     const TheObj = this;
-    TheObj.HelloWorld();
+    TheObj.HelloWorld( new CBoy() );
+    TheObj.HelloWorld( new CGirl() );
     TheObj.CloseDlg();
 }
  
