@@ -17,7 +17,7 @@
    ボタンが押された　→　onClick　→　CallFuncでBridgeTalkを使用してHelloWorld2を呼ぶ　→　HelloWorldを呼ぶ
 */
 
-// Ver.1.0 : 2025/12/27
+// Ver.1.0 : 2026/01/15
 
 
 #target illustrator
@@ -34,11 +34,39 @@ $.evalFile(SELF.path + "/ZazLib/" + "PaletteWindow.jsx");
 
 
 //-----------------------------------
-// クラス CHellowWorldDlg
+// クラス CBoy
 //-----------------------------------
 
 // コンストラクタ (ここから) 
-function CHellowWorldDlg( DlgName, InstanceName ) { 
+function CBoy() { 
+} // コンストラクタ (ここまで) 
+
+// 追加したいメソッドをここで定義
+CBoy.prototype.HayHelloW = function() {
+    alert("Hellow world. I'm boy.");
+}
+
+
+//-----------------------------------
+// クラス CGirl
+//-----------------------------------
+
+// コンストラクタ (ここから) 
+function CGirl() { 
+} // コンストラクタ (ここまで) 
+
+// 追加したいメソッドをここで定義
+CGirl.prototype.HayHelloW = function() {
+    alert("Hellow world. I'm girl.");
+}
+
+
+//-----------------------------------
+// クラス CHelloWorldDlg
+//-----------------------------------
+
+// コンストラクタ (ここから) 
+function CHelloWorldDlg( DlgName, InstanceName ) { 
        
     // 初期化
     const TheObj = this;
@@ -48,10 +76,10 @@ function CHellowWorldDlg( DlgName, InstanceName ) {
     const TheDialog = TheObj.GetDlg();      // ダイアログへのオブジェクトを得る
 
     // ダイアログにボタン追加
-    myButton = TheObj.AddButton("Push");
+    myButton = TheObj.AddButton("Push to Say Hellow World");
     myButton.onClick = function() {
         try {
-            TheObj.CallFunc( "HelloWorld2" );
+            TheObj.CallFunc( "SayHelloWorld" );
         }
         catch(e) {
             alert( e.message );
@@ -61,24 +89,25 @@ function CHellowWorldDlg( DlgName, InstanceName ) {
 } // コンストラクタ (ここまで) 
 
 
-CHellowWorldDlg.prototype = CPaletteWindow.prototype;   // サブクラスのメソッド追加よりも先に、継承させること
+CHelloWorldDlg.prototype = CPaletteWindow.prototype;   // サブクラスのメソッド追加よりも先に、継承させること
 
 
 // 追加したいソッドをここで定義
-CHellowWorldDlg.prototype.HelloWorld = function() {
-    alert("Hellow world 2026");
+CHelloWorldDlg.prototype.HelloWorld = function( Human ) {
+    Human.HayHelloW();
 }
     
 // 追加したいメソッドをここで定義
-CHellowWorldDlg.prototype.HelloWorld2 = function() {
+CHelloWorldDlg.prototype.SayHelloWorld = function() {
     const TheObj = this;
-    TheObj.HelloWorld();
+    TheObj.HelloWorld( new CBoy() );
+    TheObj.HelloWorld( new CGirl() );
     TheObj.CloseDlg();
 }
  
 
-//インスタンスを生成。なお、CHellowWorldDlgの引数にも、インスタンス名(DlgPaint)を記入のこと！！
-var DlgPaint = new CHellowWorldDlg( "test", "DlgPaint" );
+//インスタンスを生成。なお、CHelloWorldDlgの引数にも、インスタンス名(DlgPaint)を記入のこと！！
+var DlgPaint = new CHelloWorldDlg( "HelloWorld", "DlgPaint" );
 
 main();
 
