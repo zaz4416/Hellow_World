@@ -17,7 +17,7 @@
    ボタンが押された　→　onClick　→　CallFuncでBridgeTalkを使用してHelloWorld2を呼ぶ　→　HelloWorldを呼ぶ
 */
 
-// Ver.1.0 : 2026/01/15
+// Ver.1.0 : 2026/01/18
 
 
 #target illustrator
@@ -33,6 +33,27 @@ SELF = (function(){
 $.evalFile(SELF.path + "/ZazLib/" + "PaletteWindow.jsx");
 
 
+// 言語ごとの辞書を定義
+var LangStrings = {
+    confirm: {
+        en: "Push this button",
+        ja: "このボタンを押してください"
+    },
+    hello_world: {
+        en: "Hello world",
+        ja: "こんにちは世界"
+    },
+    boy: {
+        en: "I'm boy",
+        ja: "私は男の子です"
+    },
+    girl: {
+        en: "I'm girl",
+        ja: "私は女の子です"
+    },
+};
+
+
 //-----------------------------------
 // クラス CBoy
 //-----------------------------------
@@ -42,8 +63,9 @@ function CBoy() {
 } // コンストラクタ (ここまで) 
 
 // 追加したいメソッドをここで定義
-CBoy.prototype.HayHelloW = function() {
-    alert("Hellow world. I'm boy.");
+CBoy.prototype.HayHello = function() {
+    //alert($.locale);
+    alert(localize(LangStrings.hello_world) + "\n" + localize(LangStrings.boy));
 }
 
 
@@ -56,8 +78,8 @@ function CGirl() {
 } // コンストラクタ (ここまで) 
 
 // 追加したいメソッドをここで定義
-CGirl.prototype.HayHelloW = function() {
-    alert("Hellow world. I'm girl.");
+CGirl.prototype.HayHello = function() {
+    alert(localize(LangStrings.hello_world) + "\n" + localize(LangStrings.girl));
 }
 
 
@@ -76,7 +98,7 @@ function CHelloWorldDlg( DlgName, InstanceName ) {
     const TheDialog = TheObj.GetDlg();      // ダイアログへのオブジェクトを得る
 
     // ダイアログにボタン追加
-    myButton = TheObj.AddButton("Push to Say Hellow World");
+    myButton = TheObj.AddButton( localize(LangStrings.confirm) );
     myButton.onClick = function() {
         try {
             TheObj.CallFunc( "SayHelloWorld" );
@@ -94,7 +116,7 @@ CHelloWorldDlg.prototype = CPaletteWindow.prototype;   // サブクラスのメ�
 
 // 追加したいソッドをここで定義
 CHelloWorldDlg.prototype.HelloWorld = function( Human ) {
-    Human.HayHelloW();
+    Human.HayHello();
 }
     
 // 追加したいメソッドをここで定義
