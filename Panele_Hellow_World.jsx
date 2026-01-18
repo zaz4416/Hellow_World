@@ -54,18 +54,47 @@ var LangStrings = {
 };
 
 
+// プロパティ・メソッドをコピーする汎用関数
+function ClassInheritance(subClass, superClass) {
+    for (var prop in superClass.prototype) {
+        if (superClass.prototype.hasOwnProperty(prop)) {
+            subClass.prototype[prop] = superClass.prototype[prop];
+        }
+    }
+}
+
+
+//-----------------------------------
+// クラス CHuman
+//-----------------------------------
+
+// コンストラクタ (ここから) 
+function CHuman() { 
+} // コンストラクタ (ここまで) 
+
+// 追加したいメソッドをここで定義
+CHuman.prototype.HayHelloAnyone = function( Anyone ) {
+    //alert($.locale);
+    alert(localize(LangStrings.hello_world) + "\n" + Anyone );
+}
+
+
 //-----------------------------------
 // クラス CBoy
 //-----------------------------------
 
 // コンストラクタ (ここから) 
-function CBoy() { 
+function CBoy() {
+    CHuman.call(this);  // 親のプロパティを継承
 } // コンストラクタ (ここまで) 
 
-// 追加したいメソッドをここで定義
+// CHumanのメソッドをコピー
+ClassInheritance(CBoy, CHuman);
+
+// ClassInheritanceの後ろで、追加したいメソッドを定義
 CBoy.prototype.HayHello = function() {
     //alert($.locale);
-    alert(localize(LangStrings.hello_world) + "\n" + localize(LangStrings.boy));
+    this.HayHelloAnyone( localize(LangStrings.boy) );
 }
 
 
@@ -74,12 +103,16 @@ CBoy.prototype.HayHello = function() {
 //-----------------------------------
 
 // コンストラクタ (ここから) 
-function CGirl() { 
+function CGirl() {
+    CHuman.call(this); // 親のプロパティを継承
 } // コンストラクタ (ここまで) 
 
-// 追加したいメソッドをここで定義
+// CHumanのメソッドをコピー
+ClassInheritance(CGirl, CHuman);
+
+// ClassInheritanceの後ろで、追加したいメソッドを定義
 CGirl.prototype.HayHello = function() {
-    alert(localize(LangStrings.hello_world) + "\n" + localize(LangStrings.girl));
+    this.HayHelloAnyone( localize(LangStrings.girl) );
 }
 
 
@@ -91,14 +124,13 @@ CGirl.prototype.HayHello = function() {
 function CHelloWorldDlg( DlgName, InstanceName ) { 
        
     // 初期化
-    const TheObj = this;
-    CPaletteWindow.call( TheObj );          // コンストラクタ
+    var TheObj = this;                      // クラスインスタンスを指す this を退避
+    CPaletteWindow.call( TheObj, false );   // 親のプロパティを継承
     TheObj.InitDialog( DlgName );           // イニシャライザ
     TheObj.InitInstance( InstanceName );    // インスタンス初期化
-    const TheDialog = TheObj.GetDlg();      // ダイアログへのオブジェクトを得る
 
     // ダイアログにボタン追加
-    myButton = TheObj.AddButton( localize(LangStrings.confirm) );
+    var myButton = TheObj.AddButton( localize(LangStrings.confirm) );
     myButton.onClick = function() {
         try {
             TheObj.CallFunc( "SayHelloWorld" );
@@ -110,9 +142,8 @@ function CHelloWorldDlg( DlgName, InstanceName ) {
 
 } // コンストラクタ (ここまで) 
 
-
-CHelloWorldDlg.prototype = CPaletteWindow.prototype;   // サブクラスのメソッド追加よりも先に、継承させること
-
+// CHumanのメソッドをコピー
+ClassInheritance(CHelloWorldDlg, CPaletteWindow);
 
 // 追加したいソッドをここで定義
 CHelloWorldDlg.prototype.HelloWorld = function( Human ) {
@@ -121,7 +152,7 @@ CHelloWorldDlg.prototype.HelloWorld = function( Human ) {
     
 // 追加したいメソッドをここで定義
 CHelloWorldDlg.prototype.SayHelloWorld = function() {
-    const TheObj = this;
+    var TheObj = this;
     TheObj.HelloWorld( new CBoy() );
     TheObj.HelloWorld( new CGirl() );
     TheObj.CloseDlg();
