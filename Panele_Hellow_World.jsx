@@ -145,12 +145,12 @@ function CHelloWorldDlg( DlgName, InstanceName ) {
 // CHumanのメソッドをコピー
 ClassInheritance(CHelloWorldDlg, CPaletteWindow);
 
-// 追加したいソッドをここで定義
+// ClassInheritanceの後ろで、追加したいメソッドを定義
 CHelloWorldDlg.prototype.HelloWorld = function( Human ) {
     Human.HayHello();
 }
     
-// 追加したいメソッドをここで定義
+// ClassInheritanceの後ろで、追加したいメソッドを定義
 CHelloWorldDlg.prototype.SayHelloWorld = function() {
     var TheObj = this;
     TheObj.HelloWorld( new CBoy() );
