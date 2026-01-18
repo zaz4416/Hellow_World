@@ -124,14 +124,13 @@ CGirl.prototype.HayHello = function() {
 function CHelloWorldDlg( DlgName, InstanceName ) { 
        
     // 初期化
-    const TheObj = this;
-    CPaletteWindow.call( TheObj );          // コンストラクタ
+    var TheObj = this;                      // クラスインスタンスを指す this を退避
+    CPaletteWindow.call( TheObj, false );   // 親のプロパティを継承
     TheObj.InitDialog( DlgName );           // イニシャライザ
     TheObj.InitInstance( InstanceName );    // インスタンス初期化
-    const TheDialog = TheObj.GetDlg();      // ダイアログへのオブジェクトを得る
 
     // ダイアログにボタン追加
-    myButton = TheObj.AddButton( localize(LangStrings.confirm) );
+    var myButton = TheObj.AddButton( localize(LangStrings.confirm) );
     myButton.onClick = function() {
         try {
             TheObj.CallFunc( "SayHelloWorld" );
@@ -143,9 +142,8 @@ function CHelloWorldDlg( DlgName, InstanceName ) {
 
 } // コンストラクタ (ここまで) 
 
-
-CHelloWorldDlg.prototype = CPaletteWindow.prototype;   // サブクラスのメソッド追加よりも先に、継承させること
-
+// CHumanのメソッドをコピー
+ClassInheritance(CHelloWorldDlg, CPaletteWindow);
 
 // 追加したいソッドをここで定義
 CHelloWorldDlg.prototype.HelloWorld = function( Human ) {
@@ -154,7 +152,7 @@ CHelloWorldDlg.prototype.HelloWorld = function( Human ) {
     
 // 追加したいメソッドをここで定義
 CHelloWorldDlg.prototype.SayHelloWorld = function() {
-    const TheObj = this;
+    var TheObj = this;
     TheObj.HelloWorld( new CBoy() );
     TheObj.HelloWorld( new CGirl() );
     TheObj.CloseDlg();
