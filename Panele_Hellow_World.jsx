@@ -54,13 +54,24 @@ var LangStrings = {
 };
 
 
-// プロパティ・メソッドをコピーする汎用関数
 function ClassInheritance(subClass, superClass) {
-    for (var prop in superClass.prototype) {
-        if (superClass.prototype.hasOwnProperty(prop)) {
-            subClass.prototype[prop] = superClass.prototype[prop];
+    // 1. 静的プロパティ・メソッドの継承 (親クラス自体のプロパティを子にコピー)
+    for (var prop in superClass) {
+        if (superClass.hasOwnProperty(prop)) {
+            subClass[prop] = superClass[prop];
         }
     }
+
+    // 2. プロトタイプチェーンの構築 (代理関数を使用)
+    function Surrogate() {
+        this.constructor = subClass;
+    }
+    Surrogate.prototype = superClass.prototype;
+    subClass.prototype = new Surrogate();
+
+    // 3. 親クラスへのショートカット（子クラスから親のメソッドを呼びやすくする）
+    // 例: subClass.superClass.methodName.call(this)
+    subClass.superClass = superClass.prototype;
 }
 
 
@@ -124,16 +135,17 @@ CGirl.prototype.HayHello = function() {
 function CHelloWorldDlg( DlgName, InstanceName ) { 
        
     // 初期化
-    var TheObj = this;                      // クラスインスタンスを指す this を退避
-    CPaletteWindow.call( TheObj, false );   // 親のプロパティを継承
-    TheObj.InitDialog( DlgName );           // イニシャライザ
-    TheObj.InitInstance( InstanceName );    // インスタンス初期化
+    CPaletteWindow.call( this, false );   // 親のプロパティを継承
+    this.InitDialog( DlgName );           // イニシャライザ
+    this.InitInstance( InstanceName );    // インスタンス初期化
+
+    CHelloWorldDlg.TheObj = this;         // クラスインスタンスを指す this を退避( 静的プロパティ )
 
     // ダイアログにボタン追加
-    var myButton = TheObj.AddButton( localize(LangStrings.confirm) );
+    var myButton = this.AddButton( localize(LangStrings.confirm) );
     myButton.onClick = function() {
         try {
-            TheObj.CallFunc( "SayHelloWorld" );
+            CHelloWorldDlg.TheObj.CallFunc( "SayHelloWorld" );
         }
         catch(e) {
             alert( e.message );
@@ -152,10 +164,9 @@ CHelloWorldDlg.prototype.HelloWorld = function( Human ) {
     
 // ClassInheritanceの後ろで、追加したいメソッドを定義
 CHelloWorldDlg.prototype.SayHelloWorld = function() {
-    var TheObj = this;
-    TheObj.HelloWorld( new CBoy() );
-    TheObj.HelloWorld( new CGirl() );
-    TheObj.CloseDlg();
+    CHelloWorldDlg.TheObj.HelloWorld( new CBoy() );
+    CHelloWorldDlg.TheObj.HelloWorld( new CGirl() );
+    CHelloWorldDlg.TheObj.CloseDlg();
 }
  
 
