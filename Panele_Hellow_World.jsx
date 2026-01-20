@@ -132,12 +132,12 @@ CGirl.prototype.HayHello = function() {
 //-----------------------------------
 
 // コンストラクタ (ここから) 
-function CHelloWorldDlg( DlgName, InstanceName ) { 
-       
+function CHelloWorldDlg( DlgName ) {
+      
     // 初期化
-    CPaletteWindow.call( this, false );   // 親のプロパティを継承
-    this.InitDialog( DlgName );           // イニシャライザ
-    this.InitInstance( InstanceName );    // インスタンス初期化
+    CPaletteWindow.call( this, false );         // 親のプロパティを継承
+    this.InitDialog( DlgName );                 // イニシャライザ
+    this.InitInstance( CHelloWorldDlg.name );   // インスタンス初期化
 
     CHelloWorldDlg.TheObj = this;         // クラスインスタンスを指す this を退避( 静的プロパティ )
 
@@ -170,8 +170,8 @@ CHelloWorldDlg.prototype.HelloWorld = function( Human ) {
 }
  
 
-//インスタンスを生成。なお、CHelloWorldDlgの引数にも、インスタンス名(DlgPaint)を記入のこと！！
-var DlgPaint = new CHelloWorldDlg( "HelloWorld", "CHelloWorldDlg" );
+//インスタンスを生成。
+var DlgPaint = new CHelloWorldDlg( "HelloWorld" );
 
 main();
 
