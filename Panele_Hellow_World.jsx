@@ -17,7 +17,7 @@
    ボタンが押された　→　onClick　→　CallFuncでBridgeTalkを使用してSayHelloWorldを呼ぶ　→　HelloWorldを呼ぶ
 */
 
-// Ver.1.0 : 2026/01/18
+// Ver.1.0 : 2026/01/20
 
 
 #target illustrator
@@ -52,16 +52,6 @@ var LangStrings = {
         ja: "私は女の子です"
     },
 };
-
-
-// プロパティ・メソッドをコピーする汎用関数
-function ClassInheritance(subClass, superClass) {
-    for (var prop in superClass.prototype) {
-        if (superClass.prototype.hasOwnProperty(prop)) {
-            subClass.prototype[prop] = superClass.prototype[prop];
-        }
-    }
-}
 
 
 //-----------------------------------
@@ -121,19 +111,19 @@ CGirl.prototype.HayHello = function() {
 //-----------------------------------
 
 // コンストラクタ (ここから) 
-function CHelloWorldDlg( DlgName, InstanceName ) { 
-       
+function CHelloWorldDlg( DlgName ) {
+      
     // 初期化
-    var TheObj = this;                      // クラスインスタンスを指す this を退避
-    CPaletteWindow.call( TheObj, false );   // 親のプロパティを継承
-    TheObj.InitDialog( DlgName );           // イニシャライザ
-    TheObj.InitInstance( InstanceName );    // インスタンス初期化
+    CPaletteWindow.call( this, false );   // 親のプロパティを継承
+    this.InitDialog( DlgName );           // イニシャライザ
+
+    CHelloWorldDlg.TheObj = this;         // クラスインスタンスを指す this を退避( 静的プロパティ )
 
     // ダイアログにボタン追加
-    var myButton = TheObj.AddButton( localize(LangStrings.confirm) );
+    var myButton = this.AddButton( localize(LangStrings.confirm) );
     myButton.onClick = function() {
         try {
-            TheObj.CallFunc( "SayHelloWorld" );
+            CHelloWorldDlg.TheObj.CallFunc( "SayHelloWorld" ); // 静的メソッドを呼び出すこと
         }
         catch(e) {
             alert( e.message );
@@ -142,25 +132,24 @@ function CHelloWorldDlg( DlgName, InstanceName ) {
 
 } // コンストラクタ (ここまで) 
 
-// CHumanのメソッドをコピー
+// 静的メソッド
+CHelloWorldDlg.SayHelloWorld = function() {
+    CHelloWorldDlg.TheObj.HelloWorld( new CBoy() );
+    CHelloWorldDlg.TheObj.HelloWorld( new CGirl() );
+    CHelloWorldDlg.TheObj.CloseDlg();
+}  
+
+// メソッドをコピー
 ClassInheritance(CHelloWorldDlg, CPaletteWindow);
 
 // ClassInheritanceの後ろで、追加したいメソッドを定義
 CHelloWorldDlg.prototype.HelloWorld = function( Human ) {
     Human.HayHello();
 }
-    
-// ClassInheritanceの後ろで、追加したいメソッドを定義
-CHelloWorldDlg.prototype.SayHelloWorld = function() {
-    var TheObj = this;
-    TheObj.HelloWorld( new CBoy() );
-    TheObj.HelloWorld( new CGirl() );
-    TheObj.CloseDlg();
-}
  
 
-//インスタンスを生成。なお、CHelloWorldDlgの引数にも、インスタンス名(DlgPaint)を記入のこと！！
-var DlgPaint = new CHelloWorldDlg( "HelloWorld", "DlgPaint" );
+//インスタンスを生成。
+var DlgPaint = new CHelloWorldDlg( "HelloWorld" );
 
 main();
 
