@@ -17,7 +17,7 @@
    ボタンが押された　→　onClick　→　CallFuncでBridgeTalkを使用してSayHelloWorldを呼ぶ　→　HelloWorldを呼ぶ
 */
 
-// Ver.1.0 : 2026/01/20
+// Ver.1.0 : 2026/01/21
 
 
 #target illustrator
@@ -134,9 +134,10 @@ function CHelloWorldDlg( DlgName ) {
 
 // 静的メソッド
 CHelloWorldDlg.SayHelloWorld = function() {
-    CHelloWorldDlg.TheObj.HelloWorld( new CBoy() );
-    CHelloWorldDlg.TheObj.HelloWorld( new CGirl() );
-    CHelloWorldDlg.TheObj.CloseDlg();
+    var Dlg = CHelloWorldDlg.TheObj;
+    Dlg.HelloWorld( new CBoy() );
+    Dlg.HelloWorld( new CGirl() );
+    Dlg.CloseDlg();
 }  
 
 // メソッドをコピー
