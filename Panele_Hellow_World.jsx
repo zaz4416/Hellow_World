@@ -17,7 +17,7 @@
    ボタンが押された　→　onClick　→　CallFuncでBridgeTalkを使用してSayHelloWorldを呼ぶ　→　HelloWorldを呼ぶ
 */
 
-// Ver.1.0 : 2026/01/21
+// Ver.1.0 : 2026/01/23
 
 
 #target illustrator
@@ -58,11 +58,11 @@ var LangStrings = {
 // クラス CHuman
 //-----------------------------------
 
-// コンストラクタ (ここから) 
+// 1. コンストラクタ定義
 function CHuman() { 
-} // コンストラクタ (ここまで) 
+}
 
-// 追加したいメソッドをここで定義
+// 2. プロトタイプメソッドの定義
 CHuman.prototype.HayHelloAnyone = function( Anyone ) {
     //alert($.locale);
     alert(localize(LangStrings.hello_world) + "\n" + Anyone );
@@ -73,15 +73,15 @@ CHuman.prototype.HayHelloAnyone = function( Anyone ) {
 // クラス CBoy
 //-----------------------------------
 
-// コンストラクタ (ここから) 
+// 1. コンストラクタ定義
 function CBoy() {
     CHuman.call(this);  // 親のプロパティを継承
-} // コンストラクタ (ここまで) 
+}
 
-// CHumanのメソッドをコピー
+// 2. クラス継承
 ClassInheritance(CBoy, CHuman);
 
-// ClassInheritanceの後ろで、追加したいメソッドを定義
+// 3. プロトタイプメソッドの定義
 CBoy.prototype.HayHello = function() {
     //alert($.locale);
     this.HayHelloAnyone( localize(LangStrings.boy) );
@@ -92,15 +92,15 @@ CBoy.prototype.HayHello = function() {
 // クラス CGirl
 //-----------------------------------
 
-// コンストラクタ (ここから) 
+// 1. コンストラクタ定義
 function CGirl() {
     CHuman.call(this); // 親のプロパティを継承
 } // コンストラクタ (ここまで) 
 
-// CHumanのメソッドをコピー
+// 2. クラス継承
 ClassInheritance(CGirl, CHuman);
 
-// ClassInheritanceの後ろで、追加したいメソッドを定義
+// 3. プロトタイプメソッドの定義
 CGirl.prototype.HayHello = function() {
     this.HayHelloAnyone( localize(LangStrings.girl) );
 }
@@ -110,60 +110,54 @@ CGirl.prototype.HayHello = function() {
 // クラス CHelloWorldDlg
 //-----------------------------------
 
-// コンストラクタ (ここから) 
+// 1. コンストラクタ定義
 function CHelloWorldDlg( DlgName ) {
       
     // 初期化
     CPaletteWindow.call( this, false );   // 親のプロパティを継承
     this.InitDialog( DlgName );           // イニシャライザ
 
-    CHelloWorldDlg.TheObj = this;         // クラスインスタンスを指す this を退避( 静的プロパティ )
+    // インスタンスのコンストラクタ（子クラス自身）の静的プロパティに保存することで、動的に静的プロパティを定義
+    this.constructor.TheObj = this;
+
+    var self = this;
 
     // ダイアログにボタン追加
     var myButton = this.AddButton( localize(LangStrings.confirm) );
     myButton.onClick = function() {
         try {
-            CHelloWorldDlg.TheObj.CallFunc( "SayHelloWorld" ); // 静的メソッドを呼び出すこと
+            self.CallFunc( "SayHelloWorld" ); // 静的メソッドを呼び出すこと
         }
         catch(e) {
             alert( e.message );
         }
     }
 
-} // コンストラクタ (ここまで) 
+}
 
-// 静的メソッド
+// 2. クラス継承
+ClassInheritance(CHelloWorldDlg, CPaletteWindow);
+
+// 3. 静的メソッドの定義
 CHelloWorldDlg.SayHelloWorld = function() {
-    var Dlg = CHelloWorldDlg.TheObj;
+    var Dlg = CHelloWorldDlg.TheObj;    // 動的に生成された静的プロパティ
     Dlg.HelloWorld( new CBoy() );
     Dlg.HelloWorld( new CGirl() );
     Dlg.CloseDlg();
 }  
 
-// メソッドをコピー
-ClassInheritance(CHelloWorldDlg, CPaletteWindow);
-
-// ClassInheritanceの後ろで、追加したいメソッドを定義
+// 4. プロトタイプメソッドの定義
 CHelloWorldDlg.prototype.HelloWorld = function( Human ) {
     Human.HayHello();
 }
  
 
 //インスタンスを生成。
-var DlgPaint = new CHelloWorldDlg( "HelloWorld" );
+var DlgHello = new CHelloWorldDlg( "HelloWorld" );
 
 main();
 
 function main()
 {    
-    // バージョン・チェック
-    if( appVersion()[0]  >= 24)
-    {
-        DlgPaint.ShowDlg();
-    }
-    else
-    {
-         var msg = {en : 'This script requires Illustrator 2020.', ja : 'このスクリプトは Illustrator 2020以降に対応しています。'} ;
-        alert(msg) ; 
-     }
+    DlgHello.ShowDlg();
 }
