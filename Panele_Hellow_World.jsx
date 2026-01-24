@@ -123,7 +123,10 @@ function CSurface( DlgName ) {
     var self = this;            // クラスへののポインタを確保
 
     // 1. 偽のコンストラクタ（既存のダイアログを返す）
-    var FakeWindow = function() { return self.m_Dialog; };
+    var FakeWindow = function() {
+        $.writeln( "オーバーライドされたwindowを実行" );
+        return self.m_Dialog;
+    };
     // オリジナルのWindowプロトタイプを継承させておく（instanceof対策）
     FakeWindow.prototype = _OriginalWindow.prototype;
 
