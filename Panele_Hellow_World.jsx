@@ -148,8 +148,6 @@ function CSurface( DlgName ) {
     // グローバルの Window ではなく、FakeWindow（= self.m_Dialog）を参照します
     (function(Window) {
         try {
-            eval(guiCode);
-
             // 1. guiCode から "var 変数名" をすべて抜き出す（正規表現）
             var varNames = [];
             var match;
