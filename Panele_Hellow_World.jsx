@@ -109,6 +109,8 @@ CGirl.prototype.HayHello = function() {
 // クラス CSurface
 //-----------------------------------
 
+var _OriginalWindow = Window; 
+
 // 1. コンストラクタ定義
 function CSurface( DlgName ) {
     CPaletteWindow.call( this,false );       // コンストラクタ
