@@ -126,7 +126,7 @@ function CSurface( DlgName ) {
     var selfFile = new File($.fileName);
     var currentDir = selfFile.parent;
 
-    if ( self.LoadGUIfromJSX( currentDir.fullName + "/GUI/GUI_Surface.jsx" ) )
+    if ( self.LoadGUIfromJSX( currentDir.fullName + "/GUI/ScriptUI Dialog Builder - Export.jsx" ) )
     {
         // GUIに変更を入れる
         self.button1.text = localize(LangStrings.confirm);
