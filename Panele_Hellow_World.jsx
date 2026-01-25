@@ -70,7 +70,7 @@ function CHuman() {
 // 2. プロトタイプメソッドの定義
 CHuman.prototype.HayHelloAnyone = function( Anyone ) {
     //alert($.locale);
-    alert(localize(LangStrings.hello_world) + "\n" + Anyone );
+    alert(LangStrings.hello_world + "\n" + Anyone );
 }
 
 
@@ -89,7 +89,7 @@ ClassInheritance(CBoy, CHuman);
 // 3. プロトタイプメソッドの定義
 CBoy.prototype.HayHello = function() {
     //alert($.locale);
-    this.HayHelloAnyone( localize(LangStrings.boy) );
+    this.HayHelloAnyone( LangStrings.boy );
 }
 
 
@@ -107,7 +107,7 @@ ClassInheritance(CGirl, CHuman);
 
 // 3. プロトタイプメソッドの定義
 CGirl.prototype.HayHello = function() {
-    this.HayHelloAnyone( localize(LangStrings.girl) );
+    this.HayHelloAnyone( LangStrings.girl );
 }
 
  //-----------------------------------
