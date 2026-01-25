@@ -60,12 +60,12 @@ var LangStrings = {
 //-----------------------------------
 
 // 1. コンストラクタ定義
-function CHuman() { 
+function CHuman() {
 }
 
 // 2. プロトタイプメソッドの定義
 CHuman.prototype.HayHelloAnyone = function( Anyone ) {
-    alert(LangStrings.hello_world + "\n" + Anyone );
+    alert(localize(LangStrings.hello_world) + "\n" + Anyone );  // BridgeTalk後に呼ばれるので、localize()が必要
 }
 
 
@@ -83,7 +83,7 @@ ClassInheritance(CBoy, CHuman);
 
 // 3. プロトタイプメソッドの定義
 CBoy.prototype.HayHello = function() {
-    this.HayHelloAnyone( LangStrings.boy );
+    this.HayHelloAnyone( localize(LangStrings.boy) );   // BridgeTalk後に呼ばれるので、localize()が必要
 }
 
 
@@ -101,7 +101,7 @@ ClassInheritance(CGirl, CHuman);
 
 // 3. プロトタイプメソッドの定義
 CGirl.prototype.HayHello = function() {
-    this.HayHelloAnyone( LangStrings.girl );
+    this.HayHelloAnyone( localize(LangStrings.girl) );  // BridgeTalk後に呼ばれるので、localize()が必要
 }
 
 
@@ -150,8 +150,8 @@ CHelloWorldDlg.prototype.onSayHelloWorldClick = function() {
         alert( e.message );
     }
 }
-CHelloWorldDlg.prototype.HelloWorld = function( Human ) {
-    Human.HayHello();
+CHelloWorldDlg.prototype.HelloWorld = function( ClassOfSomeone ) {
+    ClassOfSomeone.HayHello();
 }
  
 
