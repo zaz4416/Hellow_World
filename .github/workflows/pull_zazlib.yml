@@ -1,0 +1,31 @@
+﻿name: Pull zazlib                           # ワークフロー名
+
+on:                                         # 手動実行イベント
+  workflow_dispatch:
+
+jobs:                                       # ジョブ定義
+  pull_zazlib:                              # ジョブID（追加：インデント修正のため）
+    runs-on: ubuntu-latest                  # ランナー
+
+    permissions:                            # 2026年現在の推奨：明示的な書き込み権限
+      contents: write
+
+    steps:                                  # ステップ定義
+      # 1. リポジトリの内容をチェックアウト
+      - name: 1. Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true                   # サブモジュールが含まれる場合は必須
+          token: ${{ secrets.GITHUB_TOKEN }} # 認証トークンの明示
+
+      # 2. zazlibフォルダ内でgit操作を実行
+      - name: 2. Update submodule in local
+        run: |
+        
+          # サブモジュールを最新のリモートコミットに更新
+          git submodule update --init --recursive --remote
+        
+          # 状態確認
+          git status
+
+          

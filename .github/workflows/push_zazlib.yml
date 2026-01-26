@@ -1,0 +1,45 @@
+﻿name: Push zazlib                           # ワークフロー名
+
+on:                                         # 手動実行イベント
+  workflow_dispatch:
+
+jobs:                                       # ジョブ定義
+  Push-zazlib-and-check:                    # ジョブID（追加：インデント修正のため）
+    runs-on: ubuntu-latest                  # ランナー
+
+    permissions:                            # 2026年現在の推奨：明示的な書き込み権限
+      contents: write
+
+    steps:                                  # ステップ定義
+      # 1. リポジトリの内容をチェックアウト
+      - name: 1. Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main                         # 操作したいブランチ名を指定
+          submodules: true                  # サブモジュールが含まれる場合は必須
+          fetch-depth: 0                    # 履歴を全て取得（プッシュ時の競合回避に必要）
+          token: ${{ secrets.GITHUB_TOKEN }} # 認証トークンの明示
+
+      # 2. zazlibフォルダ内でgit操作を実行
+      - name: 2. Git operation in zazlib
+        working-directory: ./zazlib         # zazlibディレクトリをカレントにする
+        run: |
+        
+          # 2-1. Gitのユーザー設定（コミットに必須）
+          git config user.name "zaz4416"
+          git config user.email "kaguyazxc2@gmail.com"
+        
+          # 2-2ブランチを確実にmainに向ける
+          git switch main
+          
+          # 2-3. ステージングとコミット
+          git add .
+          git commit -m "サブモジュールを更新"
+          
+          # 2-4. プッシュの実行
+          git push origin HEAD:main
+
+          # 2-5. 最終状態の確認
+          git status
+
+          
