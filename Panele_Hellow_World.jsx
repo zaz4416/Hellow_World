@@ -20,7 +20,7 @@
    ボタンが押された　→　onClick　→　CallFuncでBridgeTalkを使用してSayHelloWorldを呼ぶ　→　HelloWorldを呼ぶ
 */
 
-// Ver.1.0 : 2026/01/25
+// Ver.1.0 : 2026/01/28
 
 #target illustrator
 #targetengine "main"
@@ -35,7 +35,7 @@ $.evalFile(SELF.path + "/ZazLib/" + "PaletteWindow.jsx");
 
 
 // 言語ごとの辞書を定義
-var LangStrings = {
+var MyDictionary = {
     GUI_JSX: {
         en : "ScriptUI Dialog Builder - Export_EN.jsx",
         ja : "ScriptUI Dialog Builder - Export_JP.jsx"
@@ -54,6 +54,9 @@ var LangStrings = {
     },
 };
 
+// --- LangStringsの辞書から自動翻訳処理 ---
+var LangStrings = GetWordsFromDictionary( MyDictionary );
+
 
 //-----------------------------------
 // クラス CHuman
@@ -65,7 +68,7 @@ function CHuman() {
 
 // 2. プロトタイプメソッドの定義
 CHuman.prototype.HayHelloAnyone = function( Anyone ) {
-    alert(localize(LangStrings.hello_world) + "\n" + Anyone );  // BridgeTalk後に呼ばれるので、localize()が必要
+    alert(LangStrings.hello_world + "\n" + Anyone );
 }
 
 
@@ -83,7 +86,7 @@ ClassInheritance(CBoy, CHuman);
 
 // 3. プロトタイプメソッドの定義
 CBoy.prototype.HayHello = function() {
-    this.HayHelloAnyone( localize(LangStrings.boy) );   // BridgeTalk後に呼ばれるので、localize()が必要
+    this.HayHelloAnyone( LangStrings.boy );
 }
 
 
@@ -101,7 +104,7 @@ ClassInheritance(CGirl, CHuman);
 
 // 3. プロトタイプメソッドの定義
 CGirl.prototype.HayHello = function() {
-    this.HayHelloAnyone( localize(LangStrings.girl) );  // BridgeTalk後に呼ばれるので、localize()が必要
+    this.HayHelloAnyone( LangStrings.girl );
 }
 
 
