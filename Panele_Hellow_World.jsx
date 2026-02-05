@@ -26,6 +26,10 @@
 #targetengine "main"
 
 
+// $.global.myInstancesが定義されていたら、解放する
+//CloseAllInstances();
+
+
 /**
  * 実行中スクリプトの親フォルダ（Folderオブジェクト）を返す。
  * なお、戻り値の最後には/が付与される。
@@ -74,6 +78,36 @@ var MyDictionary = {
 // --- LangStringsの辞書から自動翻訳処理 ---
 var LangStrings = GetWordsFromDictionary( MyDictionary );
 
+
+
+if (!($.global.myInstances instanceof Array)) {
+    $.global.myInstances = [];
+}
+
+function RegisterInstance(obj) {
+    obj.ObjectNo = $.global.myInstances.length;
+    $.global.myInstances.push(obj);
+    var No = $.global.myInstances.length -1;
+    $.writeln("オブジェクト登録完了。現在の登録数:" + $.global.myInstances.length + ", 登録No=" + No);
+
+    return No;
+}
+
+
+/**
+ * 全てのインスタンスを一括で閉じるような操作も可能になります
+ */
+function CloseAllInstances() {
+    if ( $.global.myInstances.length > 0 ) {
+        var instances = $.global.myInstances;
+        for (var i = 0; i < instances.length; i++) {
+            if (instances[i].m_Dialog) {
+                instances[i].m_Dialog.close();
+            }
+        }
+        $.global.myInstances = []; // 配列をリセット
+    }
+}
 
 //-----------------------------------
 // クラス CHuman
@@ -133,6 +167,7 @@ CGirl.prototype.HayHello = function() {
 function CHelloWorldDlg() {
     CPaletteWindow.call( this, false );      // コンストラクタ
     var self = this;                         // クラスへののポインタを確保
+    this.ObjectNo = -1;
 
     // GUI用のスクリプトを読み込む
     if ( self.LoadGUIfromJSX( GetScriptDir() + LangStrings.GUI_JSX ) )
@@ -150,18 +185,31 @@ function CHelloWorldDlg() {
 ClassInheritance(CHelloWorldDlg, CPaletteWindow);
 
 // 3. 静的メソッドの定義
-CHelloWorldDlg.SayHelloWorld = function() {
+CHelloWorldDlg.prototype.SayHelloWorld = function() {
     var self = CHelloWorldDlg.self;
     self.HelloWorld( new CBoy() );
     self.HelloWorld( new CGirl() );
-    self.CloseDlg();
-}  
+    //self.GetGlobalClass().m_Dialog.close();
+} 
+
+CHelloWorldDlg.prototype.CallFuncByGlobal = function( FuncName ) {
+    var self = this;
+    var bt = new BridgeTalk;
+    bt.target = BridgeTalk.appSpecifier;
+    bt.body   = self.GetGlobalClass() + FuncName + "();";
+    bt.send();
+}
+
+CHelloWorldDlg.prototype.GetGlobalClass = function() {
+    var name = "$.global.myInstances[" + this.ObjectNo + "].";
+    return name;
+}
 
 // 4. プロトタイプメソッドの定義
 CHelloWorldDlg.prototype.onSayHelloWorldClick = function() {
     try
     {
-        this.CallFunc( "SayHelloWorld" ); // 静的メソッドを呼び出すこと
+        this.CallFuncByGlobal( "SayHelloWorld" );
     }
     catch(e)
     {
@@ -171,14 +219,17 @@ CHelloWorldDlg.prototype.onSayHelloWorldClick = function() {
 CHelloWorldDlg.prototype.HelloWorld = function( ClassOfSomeone ) {
     ClassOfSomeone.HayHello();
 }
- 
 
-//インスタンスを生成。
-var DlgHello = new CHelloWorldDlg();
 
 main();
 
 function main()
-{    
-    DlgHello.ShowDlg();
+{
+    var Obj = new CHelloWorldDlg();
+
+    // 実行するたびに配列に新しいインスタンスが追加されていきます
+    var No = RegisterInstance( Obj );
+
+    // 最新のインスタンスを表示
+    $.global.myInstances[ No ].m_Dialog.show();
 }
