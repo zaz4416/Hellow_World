@@ -20,7 +20,7 @@
    ボタンが押された　→　onClick　→　CallFuncでBridgeTalkを使用してSayHelloWorldを呼ぶ　→　HelloWorldを呼ぶ
 */
 
-// Ver.1.0 : 2026/02/05
+// Ver.1.0 : 2026/02/06
 
 #target illustrator
 #targetengine "main"
@@ -189,7 +189,7 @@ CHelloWorldDlg.prototype.SayHelloWorld = function() {
     var self = CHelloWorldDlg.self;
     self.HelloWorld( new CBoy() );
     self.HelloWorld( new CGirl() );
-    //self.GetGlobalClass().m_Dialog.close();
+    eval( self.GetGlobalClass()+"m_Dialog.close()" );
 } 
 
 CHelloWorldDlg.prototype.CallFuncByGlobal = function( FuncName ) {
@@ -231,5 +231,6 @@ function main()
     var No = RegisterInstance( Obj );
 
     // 最新のインスタンスを表示
-    $.global.myInstances[ No ].m_Dialog.show();
+    //$.global.myInstances[ No ].m_Dialog.show();
+    eval( Obj.GetGlobalClass()+"m_Dialog.show()" );
 }
