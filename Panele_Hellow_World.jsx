@@ -54,8 +54,8 @@ function GetScriptDir() {
 // 言語ごとの辞書を定義
 var MyDictionary = {
     GUI_JSX: {
-        en : "ScriptUI Dialog Builder - Export_EN.jsx",
-        ja : "ScriptUI Dialog Builder - Export_JP.jsx"
+        en : "GUI/Panele_Hellow_World/ScriptUI Dialog Builder - Export_EN.jsx",
+        ja : "GUI/Panele_Hellow_World/ScriptUI Dialog Builder - Export_JP.jsx"
     },
     hello_world: {
         en: "Hello world",
@@ -135,7 +135,7 @@ function CHelloWorldDlg() {
     var self = this;                         // クラスへののポインタを確保
 
     // GUI用のスクリプトを読み込む
-    if ( self.LoadGUIfromJSX( GetScriptDir() + "GUI/Panele_Hellow_World/" + LangStrings.GUI_JSX ) )
+    if ( self.LoadGUIfromJSX( GetScriptDir() + LangStrings.GUI_JSX ) )
     {
         // GUIに変更を入れる
         self.button1.onClick = function() { self.onSayHelloWorldClick(); }
