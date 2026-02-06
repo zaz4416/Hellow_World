@@ -33,6 +33,15 @@
 #targetengine "main"
 
 
+// 最大保持数（例：5つまで）
+var MAX_INSTANCES = 5;
+
+if (!($.global.myInstances instanceof Array)) {
+    $.global.myInstances = [];
+    $.global.instanceIdx = 0; // 次に書き込むインデックスを管理
+}
+
+
 // $.global.myInstancesが定義されていたら、解放する
 //CloseAllInstances();
 
@@ -117,17 +126,43 @@ function cloneInstance(obj) {
  */
 function RegisterInstance(newInst) {
     // newInstのプロパティに登録させたい値があれば、pushする前に、ここですること！！
-    if (typeof $.global.myInstances === "undefined") {
-        $.global.myInstances = [];
-        newInst.ObjectNo = 0;
-    } else{
-        newInst.ObjectNo = $.global.myInstances.length;
+    var idx = $.global.instanceIdx;
+
+    // --- 上書き前の解放処理 ---
+    if ($.global.myInstances[idx]) {
+        var oldInst = $.global.myInstances[idx];
+        
+        // UI（ダイアログ）を閉じて破棄
+        if (oldInst.m_Dialog) {
+            try {
+                oldInst.m_Dialog.close();
+                oldInst.m_Dialog = null; 
+            } catch(e) {
+                $.writeln("Previous dialog close failed: " + e);
+            }
+        }
+        
+        // オブジェクトの全プロパティを削除して参照を切る
+        for (var prop in oldInst) {
+            if (oldInst.hasOwnProperty(prop)) {
+                oldInst[prop] = null;
+            }
+        }
+        $.global.myInstances[idx] = null; // 明示的にnullを代入
     }
 
-    // newInstをpush
-    $.global.myInstances.push( cloneInstance(newInst) );
+    // --- ガベージコレクションの実行 ---
+    // 参照が切れたメモリを即座に回収対象にする
+    $.gc(); 
 
-    $.writeln("オブジェクト登録完了。現在の登録数:" + $.global.myInstances.length + ", 登録No=" + newInst.ObjectNo);
+    // クローンを作成して、指定した位置に代入（上書き）
+    newInst.ObjectNo = idx;
+    $.global.myInstances[idx] = cloneInstance(newInst);
+
+    // 次の書き込み位置を更新（MAX_INSTANCES に達したら 0 に戻る）
+    $.global.instanceIdx = (idx + 1) % MAX_INSTANCES;
+
+    $.writeln("オブジェクト登録完了。No: " + newInst.ObjectNo + " (次回の書き込み先: " + $.global.instanceIdx + ")");
     return newInst.ObjectNo;;
 }
 
