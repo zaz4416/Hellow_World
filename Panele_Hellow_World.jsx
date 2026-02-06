@@ -27,7 +27,7 @@
    ボタンが押された　→　onClick　→　CallFuncWithGlobalArrayでBridgeTalkを使用してSayHelloWorldを呼ぶ　→　HelloWorldを呼ぶ
 */
 
-// Ver.1.0 : 2026/02/06
+// Ver.1.0 : 2026/02/07
 
 #target illustrator
 #targetengine "main"
@@ -36,10 +36,33 @@
 // 最大保持数（例：5つまで）
 var MAX_INSTANCES = 5;
 
-if (!($.global.myInstances instanceof Array)) {
-    $.global.myInstances = [];
-    $.global.instanceIdx = 0; // 次に書き込むインデックスを管理
-}
+/*
+(function() {
+    // 1. 実行中のスクリプト名を取得（拡張子なし）
+    var scriptName = decodeURI(File($.fileName).name).replace(/\.[^\.]+$/, "");
+    
+    // 2. グローバルに格納するためのユニークなキー名を作成
+    var storageKey = "store_" + scriptName;
+    var indexKey = "idx_" + scriptName;
+
+    // 3. ブラケット記法 [] を使って、動的に $.global のプロパティにアクセス
+    if (!($.global[storageKey] instanceof Array)) {
+        $.global[storageKey] = [];
+        $.global[indexKey] = 0;
+    }
+
+    // --- 使用例 ---
+    // データの追加
+    $.global[storageKey].push("新しいデータ");
+    // インデックスの更新
+    $.global[indexKey]++;
+
+    alert("保存先: " + storageKey + "\n現在のデータ数: " + $.global[storageKey].length);
+})();
+*/
+
+
+
 
 
 // $.global.myInstancesが定義されていたら、解放する
@@ -96,12 +119,25 @@ var LangStrings = GetWordsFromDictionary( MyDictionary );
 
 
 // --- グローバル関数 -----------------------------------------------------------------
+
+//-----------------------------------
+// クラス CGlobalArray
+//-----------------------------------
+
+// 1. コンストラクタ定義
+function CGlobalArray() {
+    if (!($.global.myInstances instanceof Array)) {
+        $.global.myInstances = [];
+        $.global.instanceIdx = 0; // 次に書き込むインデックスを管理
+    }
+}
+
 /**
  * オブジェクトのプロトタイプを継承しつつ、プロパティをコピーする（ES3互換）
  * @param {Object} obj - コピー元のインスタンス
  * @returns {Object} - 新しく生成されたクローン
  */
-function cloneInstance(obj) {
+CGlobalArray.prototype.cloneInstance = function(obj) {
     if (obj === null || typeof obj !== "object") return obj;
 
     // 1. プロトタイプを継承した新しいオブジェクトを作成
@@ -124,7 +160,7 @@ function cloneInstance(obj) {
  * @param {Object} newInst - インスタンス
  * @returns {数字} - 登録No(0〜)
  */
-function RegisterInstance(newInst) {
+CGlobalArray.prototype.RegisterInstance = function(newInst) {
     // newInstのプロパティに登録させたい値があれば、pushする前に、ここですること！！
     var idx = $.global.instanceIdx;
 
@@ -155,9 +191,11 @@ function RegisterInstance(newInst) {
     // 参照が切れたメモリを即座に回収対象にする
     $.gc(); 
 
+    // クローンを作成する前に、設定が必要なプロパティに値を入れる
+    newInst.ObjectNo   = idx;
+
     // クローンを作成して、指定した位置に代入（上書き）
-    newInst.ObjectNo = idx;
-    $.global.myInstances[idx] = cloneInstance(newInst);
+    $.global.myInstances[idx] = newInst.m_ArrayOfObj.cloneInstance(newInst);
 
     // 次の書き込み位置を更新（MAX_INSTANCES に達したら 0 に戻る）
     $.global.instanceIdx = (idx + 1) % MAX_INSTANCES;
@@ -172,7 +210,7 @@ function RegisterInstance(newInst) {
  * @param {数字} No - 配列の番号(0〜)
  * @returns {文字列} - $.global.myInstancesへの文字列
  */
-function GetGlobalClass(No) {
+CGlobalArray.prototype.GetGlobalClass = function(No) {
     var name = "$.global.myInstances[" + No + "].";
     return name;
 }
@@ -181,7 +219,7 @@ function GetGlobalClass(No) {
 /**
  * 全てのインスタンスを一括で閉じるような操作も可能になります
  */
-function CloseAllInstances() {
+CGlobalArray.prototype.CloseAllInstances = function() {
     if ( $.global.myInstances.length > 0 ) {
         var instances = $.global.myInstances;
         for (var i = 0; i < instances.length; i++) {
@@ -255,6 +293,7 @@ function CHelloWorldDlg() {
     CPaletteWindow.call( this, false );      // コンストラクタ
     var self = this;                         // クラスへののポインタを確保
     this.ObjectNo = -1;
+    this.m_ArrayOfObj = new CGlobalArray();
 
     // GUI用のスクリプトを読み込む
     if ( self.LoadGUIfromJSX( GetScriptDir() + LangStrings.GUI_JSX ) )
@@ -291,7 +330,7 @@ CHelloWorldDlg.prototype.CallFuncWithGlobalArray = function( FuncName ) {
     if ( self.ObjectNo >= 0 ) {
         var bt = new BridgeTalk;
         bt.target = BridgeTalk.appSpecifier;
-        bt.body   = GetGlobalClass( this.ObjectNo ) + FuncName + "();";
+        bt.body   = self.m_ArrayOfObj.GetGlobalClass( this.ObjectNo ) + FuncName + "();";
         bt.send();
     } else {
         alert("Undefine ObjectNo in CallFuncWithGlobalArray.");
@@ -319,10 +358,19 @@ main();
 
 function main()
 {
-    // 実行するたびに配列に新しいインスタンスが追加されていきます
-    // 戻り値は、登録された配列の番号です。
-    var No = RegisterInstance( new CHelloWorldDlg() );
+    try
+    {
+        var Obj  = new CHelloWorldDlg() ;
 
-    // 最新のインスタンスを表示
-    eval( GetGlobalClass( No ) + "show()" );
+        // 実行するたびに配列に新しいインスタンスが追加されていきます
+        // 戻り値は、登録された配列の番号です。
+        var No = Obj.m_ArrayOfObj.RegisterInstance( Obj );
+
+        // 最新のインスタンスを表示
+        eval( Obj.m_ArrayOfObj.GetGlobalClass( No ) + "show()" );
+    }
+    catch(e)
+    {
+        alert( e.message );
+    }
 }
