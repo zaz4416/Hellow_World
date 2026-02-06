@@ -302,6 +302,12 @@ CHelloWorldDlg.prototype.show = function() {
     self.m_Dialog.show();
 } 
 
+CHelloWorldDlg.prototype.Func = function( FuncName ) {
+    var self = this;
+    var name = self.m_ArrayOfObj.GetGlobalClass() + FuncName;
+    eval( name );
+}
+
 CHelloWorldDlg.prototype.SayHelloWorld = function() {
     var self = this;
     self.HelloWorld( new CBoy() );
@@ -351,7 +357,7 @@ function main()
         Obj.m_ArrayOfObj.RegisterInstance( Obj );
 
         // 最新のインスタンスを表示
-        eval( Obj.m_ArrayOfObj.GetGlobalClass() + "show()" );
+        Obj.Func( "show()" );
     }
     catch(e)
     {
