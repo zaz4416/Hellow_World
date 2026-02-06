@@ -24,7 +24,7 @@
  このボタンを押すことで、Hellow Worldと表示して終わります。
 
  ボタンが押されたが押された後の処理はおおまかには、下記のようになっています。
-   ボタンが押された　→　onClick　→　CallFuncでBridgeTalkを使用してSayHelloWorldを呼ぶ　→　HelloWorldを呼ぶ
+   ボタンが押された　→　onClick　→　CallFuncWithGlobalArrayでBridgeTalkを使用してSayHelloWorldを呼ぶ　→　HelloWorldを呼ぶ
 */
 
 // Ver.1.0 : 2026/02/06
@@ -137,6 +137,11 @@ function RegisterInstance(newInst) {
 }
 
 
+/**
+ * $.global.myInstancesへの文字列を返します
+ * @param {数字} No - 配列の番号(0〜)
+ * @returns {文字列} - $.global.myInstancesへの文字列
+ */
 function GetGlobalClass(No) {
     var name = "$.global.myInstances[" + No + "].";
     return name;
@@ -237,48 +242,37 @@ function CHelloWorldDlg() {
 ClassInheritance(CHelloWorldDlg, CPaletteWindow);
 
 
+// 3. プロトタイプメソッドの定義
 CHelloWorldDlg.prototype.show = function() {
     var self = this;
     $.writeln( "ObjectNo is " + self.ObjectNo + " in show()." );
     self.m_Dialog.show();
-    //eval( self.GetGlobalClass() + "m_Dialog.show()" );
 } 
 
 CHelloWorldDlg.prototype.SayHelloWorld = function() {
     var self = this;
-    //alert( "ObjectNo is " + self.ObjectNo + " in SayHelloWorld()." );
     self.HelloWorld( new CBoy() );
     self.HelloWorld( new CGirl() );
-    slef.m_Dialog.close();
-    //eval( self.GetGlobalClass()+"m_Dialog.close()" );
+    self.m_Dialog.close();
 } 
 
-CHelloWorldDlg.prototype.CallFuncByGlobal = function( FuncName ) {
+CHelloWorldDlg.prototype.CallFuncWithGlobalArray = function( FuncName ) {
     var self = this;
-
-    //alert( "ObjectNo is " + self.ObjectNo + " in CallFuncByGlobal()." );
-
     if ( self.ObjectNo >= 0 ) {
         var bt = new BridgeTalk;
         bt.target = BridgeTalk.appSpecifier;
-        bt.body   = self.GetGlobalClass() + FuncName + "();";
+        bt.body   = GetGlobalClass( this.ObjectNo ) + FuncName + "();";
         bt.send();
     } else {
-        alert("Undefine ObjectNo in CallFuncByGlobal.");
+        alert("Undefine ObjectNo in CallFuncWithGlobalArray.");
     }
 }
 
-CHelloWorldDlg.prototype.GetGlobalClass = function() {
-    var name = "$.global.myInstances[" + this.ObjectNo + "].";
-    return name;
-}
-
-// 4. プロトタイプメソッドの定義
 CHelloWorldDlg.prototype.onSayHelloWorldClick = function() {
     var self = this;
     try
     {
-        self.CallFuncByGlobal( "SayHelloWorld" );
+        self.CallFuncWithGlobalArray( "SayHelloWorld" );
     }
     catch(e)
     {
@@ -296,6 +290,7 @@ main();
 function main()
 {
     // 実行するたびに配列に新しいインスタンスが追加されていきます
+    // 戻り値は、登録された配列の番号です。
     var No = RegisterInstance( new CHelloWorldDlg() );
 
     // 最新のインスタンスを表示
