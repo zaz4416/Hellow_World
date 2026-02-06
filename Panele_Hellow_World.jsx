@@ -277,13 +277,16 @@ CGirl.prototype.HayHello = function() {
 function CHelloWorldDlg() {
     CPaletteWindow.call( this, false );      // コンストラクタ
     var self = this;                         // クラスへののポインタを確保
-    this.m_ArrayOfObj = new CGlobalArray( _MAX_INSTANCES );
+    self.m_ArrayOfObj = new CGlobalArray( _MAX_INSTANCES );
 
     // GUI用のスクリプトを読み込む
     if ( self.LoadGUIfromJSX( GetScriptDir() + LangStrings.GUI_JSX ) )
     {
         // GUIに変更を入れる
         self.button1.onClick = function() { self.onSayHelloWorldClick(); }
+
+        // 最後に、新しいインスタンスを追加
+        self.m_ArrayOfObj.RegisterInstance( self );
     }
     else {
         alert("GUIが未定です");
@@ -300,11 +303,6 @@ CHelloWorldDlg.prototype.show = function() {
     var self = this;
     $.writeln( "ObjectNo is " + self.m_ArrayOfObj.ObjectNo + " in show()." );
     self.CallFuncInGlobalArray( "m_Dialog.show()" );
-}
-
-CHelloWorldDlg.prototype.RegisterInstance = function() {
-    var self = this;
-    self.m_ArrayOfObj.RegisterInstance( self );
 }
 
 CHelloWorldDlg.prototype.CallFuncInGlobalArray = function( FuncName ) {
@@ -357,9 +355,6 @@ function main()
     {
         // 新しいインスタンスを生成
         var Obj  = new CHelloWorldDlg() ;
-
-        // 新しいインスタンスを追加
-        Obj.RegisterInstance();
 
         // インスタンスを表示
         Obj.show();
