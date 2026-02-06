@@ -299,10 +299,10 @@ ClassInheritance(CHelloWorldDlg, CPaletteWindow);
 CHelloWorldDlg.prototype.show = function() {
     var self = this;
     $.writeln( "ObjectNo is " + self.m_ArrayOfObj.ObjectNo + " in show()." );
-    self.m_Dialog.show();
+    self.CallFuncInGlobalArray( "m_Dialog.show()" );
 } 
 
-CHelloWorldDlg.prototype.Func = function( FuncName ) {
+CHelloWorldDlg.prototype.CallFuncInGlobalArray = function( FuncName ) {
     var self = this;
     var name = self.m_ArrayOfObj.GetGlobalClass() + FuncName;
     eval( name );
@@ -357,7 +357,7 @@ function main()
         Obj.m_ArrayOfObj.RegisterInstance( Obj );
 
         // 最新のインスタンスを表示
-        Obj.Func( "show()" );
+        Obj.show();
     }
     catch(e)
     {
