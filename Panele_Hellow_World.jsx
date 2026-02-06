@@ -300,7 +300,12 @@ CHelloWorldDlg.prototype.show = function() {
     var self = this;
     $.writeln( "ObjectNo is " + self.m_ArrayOfObj.ObjectNo + " in show()." );
     self.CallFuncInGlobalArray( "m_Dialog.show()" );
-} 
+}
+
+CHelloWorldDlg.prototype.RegisterInstance = function() {
+    var self = this;
+    self.m_ArrayOfObj.RegisterInstance( self );
+}
 
 CHelloWorldDlg.prototype.CallFuncInGlobalArray = function( FuncName ) {
     var self = this;
@@ -350,13 +355,13 @@ function main()
 {
     try
     {
+        // 新しいインスタンスを生成
         var Obj  = new CHelloWorldDlg() ;
 
-        // 実行するたびに配列に新しいインスタンスが追加されていきます
-        // 戻り値は、登録された配列の番号です。
-        Obj.m_ArrayOfObj.RegisterInstance( Obj );
+        // 新しいインスタンスを追加
+        Obj.RegisterInstance();
 
-        // 最新のインスタンスを表示
+        // インスタンスを表示
         Obj.show();
     }
     catch(e)
