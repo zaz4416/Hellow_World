@@ -33,40 +33,8 @@
 #targetengine "main"
 
 
-// 最大保持数（例：5つまで）
-var MAX_INSTANCES = 5;
-
-/*
-(function() {
-    // 1. 実行中のスクリプト名を取得（拡張子なし）
-    var scriptName = decodeURI(File($.fileName).name).replace(/\.[^\.]+$/, "");
-    
-    // 2. グローバルに格納するためのユニークなキー名を作成
-    var storageKey = "store_" + scriptName;
-    var indexKey = "idx_" + scriptName;
-
-    // 3. ブラケット記法 [] を使って、動的に $.global のプロパティにアクセス
-    if (!($.global[storageKey] instanceof Array)) {
-        $.global[storageKey] = [];
-        $.global[indexKey] = 0;
-    }
-
-    // --- 使用例 ---
-    // データの追加
-    $.global[storageKey].push("新しいデータ");
-    // インデックスの更新
-    $.global[indexKey]++;
-
-    alert("保存先: " + storageKey + "\n現在のデータ数: " + $.global[storageKey].length);
-})();
-*/
-
-
-
-
-
-// $.global.myInstancesが定義されていたら、解放する
-//CloseAllInstances();
+// 最大保持数
+var _MAX_INSTANCES = 5;
 
 
 /**
@@ -125,10 +93,22 @@ var LangStrings = GetWordsFromDictionary( MyDictionary );
 //-----------------------------------
 
 // 1. コンストラクタ定義
-function CGlobalArray() {
-    if (!($.global.myInstances instanceof Array)) {
-        $.global.myInstances = [];
-        $.global.instanceIdx = 0; // 次に書き込むインデックスを管理
+function CGlobalArray(Max) {
+    var self = this;
+
+    this.MAX_INSTANCES = Max;
+
+    // 1. 実行中のスクリプト名を取得（拡張子なし）
+    var scriptName = decodeURI(File($.fileName).name).replace(/\.[^\.]+$/, "");
+
+     // 2. グローバルに格納するためのユニークなキー名を作成
+    self.storageKey = "store_" + scriptName;
+    self.indexKey   = "idx_" + scriptName;
+
+    // 3. ブラケット記法 [] を使って、動的に $.global のプロパティにアクセス
+    if (!($.global[self.storageKey] instanceof Array)) {
+        $.global[self.storageKey] = [];
+        $.global[self.indexKey  ] = 0;       // 次に書き込むインデックスを管理
     }
 }
 
@@ -156,17 +136,19 @@ CGlobalArray.prototype.cloneInstance = function(obj) {
 
 
 /**
- * $.global.myInstancesに、オブジェクトのクローンを登録する
+ * $.global[self.storageKey] に、オブジェクトのクローンを登録する
  * @param {Object} newInst - インスタンス
  * @returns {数字} - 登録No(0〜)
  */
 CGlobalArray.prototype.RegisterInstance = function(newInst) {
+    var self = this;
+
     // newInstのプロパティに登録させたい値があれば、pushする前に、ここですること！！
-    var idx = $.global.instanceIdx;
+    var idx = $.global[ self.indexKey ] ;
 
     // --- 上書き前の解放処理 ---
-    if ($.global.myInstances[idx]) {
-        var oldInst = $.global.myInstances[idx];
+    if ($.global[self.storageKey] [idx]) {
+        var oldInst = $.global[self.storageKey] [idx];
         
         // UI（ダイアログ）を閉じて破棄
         if (oldInst.m_Dialog) {
@@ -184,7 +166,7 @@ CGlobalArray.prototype.RegisterInstance = function(newInst) {
                 oldInst[prop] = null;
             }
         }
-        $.global.myInstances[idx] = null; // 明示的にnullを代入
+        $.global[self.storageKey] [idx] = null; // 明示的にnullを代入
     }
 
     // --- ガベージコレクションの実行 ---
@@ -192,26 +174,27 @@ CGlobalArray.prototype.RegisterInstance = function(newInst) {
     $.gc(); 
 
     // クローンを作成する前に、設定が必要なプロパティに値を入れる
-    newInst.ObjectNo   = idx;
+    newInst.ObjectNo = idx;
 
     // クローンを作成して、指定した位置に代入（上書き）
-    $.global.myInstances[idx] = newInst.m_ArrayOfObj.cloneInstance(newInst);
+    $.global[self.storageKey] [idx] = newInst.m_ArrayOfObj.cloneInstance(newInst);
 
     // 次の書き込み位置を更新（MAX_INSTANCES に達したら 0 に戻る）
-    $.global.instanceIdx = (idx + 1) % MAX_INSTANCES;
+    $.global[self.indexKey  ]  = (idx + 1) % self.MAX_INSTANCES;
 
-    $.writeln("オブジェクト登録完了。No: " + newInst.ObjectNo + " (次回の書き込み先: " + $.global.instanceIdx + ")");
+    $.writeln("オブジェクト登録完了。No: " + newInst.ObjectNo + " (次回の書き込み先: " + $.global[self.indexKey]  + ")");
     return newInst.ObjectNo;;
 }
 
 
 /**
- * $.global.myInstancesへの文字列を返します
+ * $.global[self.storageKey] への文字列を返します
  * @param {数字} No - 配列の番号(0〜)
- * @returns {文字列} - $.global.myInstancesへの文字列
+ * @returns {文字列} - $.global[self.storageKey] への文字列
  */
 CGlobalArray.prototype.GetGlobalClass = function(No) {
-    var name = "$.global.myInstances[" + No + "].";
+    var self = this;
+    var name = "$.global['" + self.storageKey + "'][" + No + "].";
     return name;
 }
 
@@ -220,14 +203,16 @@ CGlobalArray.prototype.GetGlobalClass = function(No) {
  * 全てのインスタンスを一括で閉じるような操作も可能になります
  */
 CGlobalArray.prototype.CloseAllInstances = function() {
-    if ( $.global.myInstances.length > 0 ) {
-        var instances = $.global.myInstances;
+    var self = this;
+
+    if ( $.global[self.storageKey] .length > 0 ) {
+        var instances = $.global[self.storageKey] ;
         for (var i = 0; i < instances.length; i++) {
             if (instances[i].m_Dialog) {
                 instances[i].m_Dialog.close();
             }
         }
-        $.global.myInstances = []; // 配列をリセット
+        $.global[self.storageKey]  = []; // 配列をリセット
     }
 }
 
@@ -293,7 +278,7 @@ function CHelloWorldDlg() {
     CPaletteWindow.call( this, false );      // コンストラクタ
     var self = this;                         // クラスへののポインタを確保
     this.ObjectNo = -1;
-    this.m_ArrayOfObj = new CGlobalArray();
+    this.m_ArrayOfObj = new CGlobalArray( _MAX_INSTANCES );
 
     // GUI用のスクリプトを読み込む
     if ( self.LoadGUIfromJSX( GetScriptDir() + LangStrings.GUI_JSX ) )
