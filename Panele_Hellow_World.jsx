@@ -4,6 +4,13 @@
 </javascriptresource>
 */
 
+/*
+コピー処理を書く際、VSCodeの拡張機能「ESLint」を入れていると、$.global が
+未定義で警告が出ることがあります。
+その場合は、ファイルの先頭に 下記を記述すると警告が消えます。
+*/
+/* global $ */
+
 /*----------------------------------------------------------
     CPaletteWindowをつかって、”Hlloe world”
 
@@ -85,6 +92,17 @@ if (!($.global.myInstances instanceof Array)) {
 }
 
 function RegisterInstance(obj) {
+
+    /*
+    // メソッドも含めて完全に複製（推奨）
+    const newInst = new MyDialogClass();
+
+    // プロトタイプ（メソッド）を維持したまま、中身をコピー
+    $.global.myInstances[this.ObjectNo] = Object.assign(
+        Object.create(Object.getPrototypeOf(newInst)), 
+        newInst
+    );
+    */
     obj.ObjectNo = $.global.myInstances.length;
     $.global.myInstances.push(obj);
     var No = $.global.myInstances.length -1;
