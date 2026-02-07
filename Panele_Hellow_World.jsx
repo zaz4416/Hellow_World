@@ -179,7 +179,7 @@ CHelloWorldDlg.prototype.onSayHelloWorldClick = function() {
     var self = this;
     try
     {
-        self.CallFunc( "SayHelloWorld" );
+        self.CallFunc( ".SayHelloWorld()" );
     }
     catch(e)
     {
